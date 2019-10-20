@@ -9,7 +9,7 @@ channels-redis==2.2.0
 constantly==15.1.0
 daphne==2.2.2
 dj-database-url==0.5.0
-Django==2.1.2
+Django==2.1.11
 django-heroku==0.3.1
 hiredis==1.0.0
 hyperlink==18.0.0
