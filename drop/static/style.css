@@ -1,0 +1,54 @@
+html, body {
+    color: white;
+    background: rgb(50,50,100);
+}
+
+.content-title {
+    text-align: center;
+    padding: 10px;
+}
+
+.row {
+    margin: 10px;
+    width: 100%;
+}
+
+.col {
+    margin: 10px;
+}
+
+.content-block {
+    padding: 10px;
+    background: rgb(90, 80, 80);
+    border: 2px solid black;
+    height: 100%;
+}
+
+.heading-block {
+    padding: 10px;
+    background: rgb(40, 40, 40);
+    border: 3px solid black;
+    height: 100%;
+}
+
+.content-link:hover {
+    background: rgb(20,20,20);
+    border: 2px solid white;
+    box-shadow: 2px 2px 2px black;
+}
+
+.link:hover {
+    background-color: blue;
+    box-shadow: 5px 5px 5px grey;
+    border: 1px solid;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+    color: white;
+}

@@ -4,7 +4,7 @@ from channels.generic.websocket import WebsocketConsumer
 import json
 
 
-class ChatConsumer(WebsocketConsumer):
+class MessagesConsumer(WebsocketConsumer):
     def connect(self):
         # get the room name from keywords defined in url route
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -50,3 +50,44 @@ class ChatConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': message
         }))
+
+
+'''
+AUTH
+channels.auth.login
+channels.auth.logout
+
+login(scope, user, backend=None)
+scope must have the user's session
+
+TOKENS
+customer middleware to intercept http headers, check if authorization exists in header
+{
+    authorization: ['Token', token_key]
+} 
+
+LOOK INTO JWT
+single auth
+- check if user in the scope = authenticated
+- if no user, try get a token and auth
+
+def receive(self, text_data=None, bytes_data=None):
+    if self.scope['user'].id:
+        pass
+    else:
+        try:
+            # It means user is not authenticated yet.
+            data = json.loads(text_data)
+            if 'token' in data.keys():
+                token = data['token']
+                user = fetch_user_from_token(token)
+                self.scope['user'] = user
+                
+        except Exception as e:
+            # Data is not valid, so close it.
+            print(e)
+            pass
+
+    if not self.scope['user'].id:
+        self.close()
+'''
