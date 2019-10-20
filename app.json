@@ -1,0 +1,10 @@
+{
+  "name": "Drop Messages",
+  "description": "api backend for drop messages mobile app",
+  "repository": "https://github.com/elodea/drop-messages-api",
+  "keywords": ["django", "channels", "websockets", "heroku"],
+  "scripts": {
+    "postdeploy": "python manage.py migrate"
+  },
+  "addons": ["heroku-postgresql", "heroku-redis"]
+}
