@@ -1,0 +1,6 @@
+#pycharm ide stuff
+.idea/
+.drop/__pycache__
+.dropmessages/__pycache__
+.migrations/__pycache__
+.templates/__pycache__
