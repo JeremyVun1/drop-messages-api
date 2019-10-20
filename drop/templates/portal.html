@@ -54,7 +54,10 @@
             <textarea id="retrieve_output" rows="20" cols="150" disabled="true" placeholder="output here..."></textarea>
         </div>
         <div class="content-block">
-            <textarea id="error_output" rows="20" cols="150" disabled="true" placeholder="misc errors..."></textarea>
+            <textarea id="notification_output" rows="5" cols="150" disabled="true" placeholder="notifications..."></textarea>
+        </div>
+        <div class="content-block">
+            <textarea id="error_output" rows="5" cols="150" disabled="true" placeholder="errors.."></textarea>
         </div>
     </div>
 
@@ -94,6 +97,9 @@
                     break;
                 case "retrieve":
                     outputDom = getDom("retrieve_output");
+                    break;
+                case "notification":
+                    outputDom = getDom("notification_output");
                     break;
                 default:
                     outputDom = getDom("error_output");

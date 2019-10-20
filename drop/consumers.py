@@ -8,6 +8,8 @@ from drop import message_facade as mf
 
 
 class MessagesConsumer(WebsocketConsumer):
+    notified_id = 0
+
     def connect(self):
         print("connecting!")
         # TODO authentication
@@ -67,18 +69,24 @@ class MessagesConsumer(WebsocketConsumer):
 
     def notify_geoloc_group(self, message):
         if message:
+            self.notified_id = message.pk
             async_to_sync(self.channel_layer.group_send)(
                 str(self.geoloc),
                 {
                     # type specifies the function to be called when received
                     'type': 'receive_new_message',
-                    'id': message.id
+                    'id': message.pk
                 }
             )
 
     def receive_new_message(self, event):
-        message = Message.objects.get(pk=event['id'])
-        self.send(text_data=json.dumps(serialize_message(message)))
+        id = event['id']
+        if self.notified_id == id:
+            notified_id = 0
+            return
+
+        m = Message.objects.get(pk=id)
+        self.send_message_to_client("notification", serialize_message(m))
 
     # send message query set back to the client
     def send_retrieved_messages(self, qs):
