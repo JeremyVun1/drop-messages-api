@@ -119,7 +119,7 @@ STATIC_URL = '/static/'
 
 
 # DJANGO CHANNELS
-ASGI_APPLICATION = "django_channels_heroku.routing.application"
+ASGI_APPLICATION = "dropmessages.routing.application"
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
