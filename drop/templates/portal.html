@@ -47,7 +47,7 @@
         <div class="content-block">
             <h2 class="content-title">RETRIEVE MESSAGES</h2>
             <input id="retrieve_range" type="number" placeholder="Range"/><br />
-            <input id="retrieve_submit" type="button" value="Retrieve Mssages"/><br />
+            <input id="retrieve_submit" type="button" value="Retrieve Messages"/><br />
         </div>
 
         <div class="content-block">
@@ -59,86 +59,91 @@
     </div>
 
 
-<script>//util functions for lazy people
-var getDom = (id) => document.getElementById(id);
-var getVal = (id) => getDom(id).value;
-
-//get web socket protocol
-var protocol = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
-var webSocket = null;
-
-// 1. Login / authenticate
-// TODO - ACTUAL TOKEN AUTH
-getDom('login_submit').onclick = function(e) {
-    var geloc = getVal('login_lat') + ',' + getVal('login_long');
-    webSocket = new WebSocket(protocol + '//' + window.location.host + '/ws/' + geoloc + '/');
-
-    // register event handlers
-    webSocket.onmessage = function(e) {
-        var data = JSON.parse(e.data);
-        var category = data['category'];
-        var message = data['message'];
-        var outputDom = null;
-
-        switch(category) {
-            case "socket":
-                outputDom = getDom('socket_output');
-                break;
-            case "post":
-                outputDom = getDom('post_output');
-                break;
-            case "retrieve":
-                outputDom = getDom('retrieve_output');
-                break;
-            default:
-                outputDom = getDom('error_output');
-        }
-
-        outputDom.value = data['message'];
+    <script>
+    //util functions for lazy people
+    function getDom(id) {
+        return document.getElementById(id);
+    }
+    function getVal(id) {
+        return getDom(id).value;
     }
 
-    webSocket.onclose = function(e) {
-        getDom('socket_output').value = "Socket closed unexpectedly";
+    //get web socket protocol
+    var protocol = (window.location.protocol === "https:") ? "wss:" : "ws:";
+    var webSocket = null;
+
+    // 1. Login / authenticate
+    // TODO - ACTUAL TOKEN AUTH
+    getDom("login_submit").onclick = function(e) {
+        var geoloc = getVal("login_lat") + "," + getVal("login_long");
+        webSocket = new WebSocket(protocol + "//" + window.location.host + "/ws/" + geoloc + "/");
+
+        // register event handlers
+        webSocket.onmessage = function(e) {
+            var json_data = JSON.parse(e.data);
+            var category = json_data.category;
+            var data = json_data.data;
+            var outputDom = null;
+
+            switch(category) {
+                case "socket":
+                    outputDom = getDom("socket_output");
+                    break;
+                case "post":
+                    outputDom = getDom("post_output");
+                    break;
+                case "retrieve":
+                    outputDom = getDom("retrieve_output");
+                    break;
+                default:
+                    outputDom = getDom("error_output");
+            }
+
+            outputDom.value = JSON.stringify(data, null, "\t");
+        };
+
+        webSocket.onclose = function(e) {
+            getDom("socket_output").value = "Socket closed unexpectedly";
+        };
     };
-}
 
-// 2. Post a message
-getDom('post_submit').onclick = function(e) {
-    var msg = getDom('post_message');
-    webSocket.send(JSON.stringify({
-        'category': 'post',
-        'message': msg.value
-    }));
-    msg.value = "";
-}
+    // 2. Post a message
+    getDom("post_submit").onclick = function(e) {
+        var msg = getDom("post_message");
+        webSocket.send(JSON.stringify({
+            "category": 0,
+            "data": msg.value
+        }));
+        msg.value = "";
+    };
 
-// 3. Retrieve messages
-getDom('retrieve_submit').onclick = function(e) {
-    webSocket.send(JSON.stringify({
-        'category': 'retrieve',
-        'range': getVal('retrieve_range'),
-    }));
-}
+    // 3. Retrieve messages by range (code: 4)
+    getDom("retrieve_submit").onclick = function(e) {
+        webSocket.send(JSON.stringify({
+            "category": 4,
+            "range": getVal("retrieve_range"),
+        }));
+    };
 
 
-// click shortcuts
-getDom('post_message').onkeyup = function(e) {
-    if (e.keyCode === 13) {
-        getDom('post_submit').click();
-    }
-}
+    // click shortcuts
+    getDom("post_message").onkeyup = function(e) {
+        if (e.keyCode === 13) {
+            getDom("post_submit").click();
+        }
+    };
 
-getDom('retrieve_range').onkeyup = function(e) {
-    if (e.keyCode === 13) {
-        getDom('retrieve_submit').click();
-    }
-}
+    getDom("retrieve_range").onkeyup = function(e) {
+        if (e.keyCode === 13) {
+            getDom("retrieve_submit").click();
+        }
+    };
 
-getDom('login_password').onkeyup = function(e) {
-    if (e.keyCode === 13) {
-        getDom('login_submit').click();
-    }
-}
-</script>
+    getDom("login_password").onkeyup = function(e) {
+        if (e.keyCode === 13) {
+            getDom("login_submit").click();
+        }
+    };
+    </script>
 </body>
 </html>
