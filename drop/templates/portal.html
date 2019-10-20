@@ -17,9 +17,13 @@
         <div class="content-block">
             <h2 class="content-title">START SOCKET</h2>
             <div class="row">
+                <div class="row">
+                    <input id="login_lat" type="text" placeholder="Latitude..."/><br />
+                    <input id="login_long" type="text" placeholder="Longitude..."/><br />
+                </div>
                 <input id="login_username" type="text" placeholder="username"/>
                 <input id="login_password" type="password" placeholder="password"/>
-                <input id="socket_status" disabled="true" size="50" type="text" placeholder="socket status..." />
+                <input id="socket_output" disabled="true" size="50" type="text" placeholder="socket status..." />
                 {% if user.is_authenticated %}
                     <p>Logged in as {{ user.username }}</p>
                 {% else %}
@@ -35,10 +39,6 @@
 
         <div class="content-block">
             <h2 class="content-title">POST MESSAGE</h2>
-            <div class="row">
-                <input id="post_lat" type="text" placeholder="Latitude..."/><br />
-                <input id="post_long" type="text" placeholder="Longitude..."/><br />
-            </div>
             <textarea id="post_message" placeholder="message..." cols="150" rows="3"></textarea><br />
             <input id="post_submit" type="button" value="Post Message"/><br/>
             <textarea id="post_output" rows="2" cols="100" disabled="true" placeholder="output here..."></textarea>
@@ -46,63 +46,99 @@
 
         <div class="content-block">
             <h2 class="content-title">RETRIEVE MESSAGES</h2>
-            <div class="row">
-                <input id="get_lat" type="text" placeholder="Latitude..."/><br />
-                <input id="get_long" type="text" placeholder="Latitude..."/><br />
-                <input id="get_range" type="number" placeholder="Range"/><br />
-            </div>
-            <input id="get_submit" type="button" value="Retrieve Mssages"/><br />
+            <input id="retrieve_range" type="number" placeholder="Range"/><br />
+            <input id="retrieve_submit" type="button" value="Retrieve Mssages"/><br />
         </div>
 
         <div class="content-block">
             <textarea id="retrieve_output" rows="20" cols="150" disabled="true" placeholder="output here..."></textarea>
         </div>
+        <div class="content-block">
+            <textarea id="error_output" rows="20" cols="150" disabled="true" placeholder="misc errors..."></textarea>
+        </div>
     </div>
 
 
-<script>
-// 1. Login / authenticate
-// 2. Post a message
-// 3. Retrieve messages
-    var roomName = {{ room_name_json }};
+<script>//util functions for lazy people
+var getDom = (id) => document.getElementById(id);
+var getVal = (id) => getDom(id).value;
 
-    var protocol = '';
-    if (window.location.protocol === 'https:') {
-        protocol = 'wss:';
-    } else {
-        protocol = 'ws:';
+//get web socket protocol
+var protocol = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+var webSocket = null;
+
+// 1. Login / authenticate
+// TODO - ACTUAL TOKEN AUTH
+getDom('login_submit').onclick = function(e) {
+    var geloc = getVal('login_lat') + ',' + getVal('login_long');
+    webSocket = new WebSocket(protocol + '//' + window.location.host + '/ws/' + geoloc + '/');
+
+    // register event handlers
+    webSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var category = data['category'];
+        var message = data['message'];
+        var outputDom = null;
+
+        switch(category) {
+            case "socket":
+                outputDom = getDom('socket_output');
+                break;
+            case "post":
+                outputDom = getDom('post_output');
+                break;
+            case "retrieve":
+                outputDom = getDom('retrieve_output');
+                break;
+            default:
+                outputDom = getDom('error_output');
+        }
+
+        outputDom.value = data['message'];
     }
 
-    var chatSocket = new WebSocket(
-        protocol + '//' + window.location.host +
-        '/ws/chat/' + roomName + '/');
-
-    chatSocket.onmessage = function(e) {
-        var data = JSON.parse(e.data);
-        var message = data['message'];
-        document.querySelector('#chat-log').value += (message + '\n');
+    webSocket.onclose = function(e) {
+        getDom('socket_output').value = "Socket closed unexpectedly";
     };
+}
 
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
+// 2. Post a message
+getDom('post_submit').onclick = function(e) {
+    var msg = getDom('post_message');
+    webSocket.send(JSON.stringify({
+        'category': 'post',
+        'message': msg.value
+    }));
+    msg.value = "";
+}
 
-    document.querySelector('#chat-message-input').focus();
-    document.querySelector('#chat-message-input').onkeyup = function(e) {
-        if (e.keyCode === 13) {  // enter, return
-            document.querySelector('#chat-message-submit').click();
-        }
-    };
+// 3. Retrieve messages
+getDom('retrieve_submit').onclick = function(e) {
+    webSocket.send(JSON.stringify({
+        'category': 'retrieve',
+        'range': getVal('retrieve_range'),
+    }));
+}
 
-    document.querySelector('#chat-message-submit').onclick = function(e) {
-        var messageInputDom = document.querySelector('#chat-message-input');
-        var message = messageInputDom.value;
-        chatSocket.send(JSON.stringify({
-            'message': message
-        }));
 
-        messageInputDom.value = '';
-    };
+// click shortcuts
+getDom('post_message').onkeyup = function(e) {
+    if (e.keyCode === 13) {
+        getDom('post_submit').click();
+    }
+}
+
+getDom('retrieve_range').onkeyup = function(e) {
+    if (e.keyCode === 13) {
+        getDom('retrieve_submit').click();
+    }
+}
+
+getDom('login_password').onkeyup = function(e) {
+    if (e.keyCode === 13) {
+        getDom('login_submit').click();
+    }
+}
 </script>
 </body>
 </html>
