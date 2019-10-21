@@ -9,7 +9,6 @@ import json
 # authentication imports
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import VerifyAuthTokenSerializer
 
 # business imports
 from .util import *
