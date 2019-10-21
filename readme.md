@@ -8,6 +8,8 @@ API backend using REST and web sockets to allow clients to,
 
 When you drop a message, all connected clients in the same geolocation are notified and pick it up. Queries by category are paginated and cached. Call with next page number to get more data. No message duplicates within each geolocation block (lat,long) to 2 decimal places. Messages automatically deleted when they are downvoted below 0, or expire after 48 hours
 
+[https://drop-messages.herokuapp.com/](https://drop-messages.herokuapp.com/)
+
 Websocket API (JSON)
 ===============
 CLIENT REQUEST
@@ -54,4 +56,14 @@ User Authentication pattern
 ==============
 1. Register a user account
 2. Get JWT token from REST endpoint
-3. Use JWT token to authenticate websocket
+3. Use JWT token to authenticate a websocket
+
+Requirements
+============
+see requirements.txt
+- django
+- djangorestframework
+- djangorestframework-jwt
+- channels
+- channels-redis
+- redis
