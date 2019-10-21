@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4ec63affdbf322cf36054edb59f10f2fa1dfa83507e7833f9ee2d1c30e82e21c"
+            "sha256": "3699a07410cf858eba138c231dadc89df22a3c3e1628f12b87368a3dc63da8b9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,51 @@
         ]
     },
     "default": {
+        "django": {
+            "hashes": [
+                "sha256:4025317ca01f75fc79250ff7262a06d8ba97cd4f82e93394b2a0a6a4a925caeb",
+                "sha256:a8ca1033acac9f33995eb2209a6bf18a4681c3e5269a878e9a7e0b7384ed1ca3"
+            ],
+            "version": "==2.2.6"
+        },
+        "djangorestframework": {
+            "hashes": [
+                "sha256:5488aed8f8df5ec1d70f04b2114abc52ae6729748a176c453313834a9ee179c8",
+                "sha256:dc81cbf9775c6898a580f6f1f387c4777d12bd87abf0f5406018d32ccae71090"
+            ],
+            "version": "==3.10.3"
+        },
+        "drf-jwt": {
+            "hashes": [
+                "sha256:5db687927968ca11d79bb879527e76d4f0e3e69b1cdf531b564bded901355fb3",
+                "sha256:82bb46ac82fc9b3702df3a374d196a9f6ab3f6b4ce4c619ae1ee7c98a9439a1e"
+            ],
+            "index": "pypi",
+            "version": "==1.13.3"
+        },
+        "pyjwt": {
+            "hashes": [
+                "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e",
+                "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"
+            ],
+            "version": "==1.7.1"
+        },
+        "pytz": {
+            "hashes": [
+                "sha256:1c557d7d0e871de1f5ccd5833f60fb2550652da6be2693c1e02300743d21500d",
+                "sha256:b02c06db6cf09c12dd25137e563b31700d3b80fcc4ad23abb7a315f2789819be"
+            ],
+            "version": "==2019.3"
+        },
+        "sqlparse": {
+            "hashes": [
+                "sha256:40afe6b8d4b1117e7dff5504d7a8ce07d9a1b15aeeade8a2d10f130a834f8177",
+                "sha256:7c3dca29c022744e95b547e867cee89f4fce4373f3549ccd8797d8eb52cdb873"
+            ],
+            "version": "==0.3.0"
+        }
+    },
+    "develop": {
         "aioredis": {
             "hashes": [
                 "sha256:71302cebeb7add86f1fe660b469068760ca4364504e75ee83dd6f6b7118bfe28",
@@ -172,7 +217,6 @@
                 "sha256:4025317ca01f75fc79250ff7262a06d8ba97cd4f82e93394b2a0a6a4a925caeb",
                 "sha256:a8ca1033acac9f33995eb2209a6bf18a4681c3e5269a878e9a7e0b7384ed1ca3"
             ],
-            "index": "pypi",
             "version": "==2.2.6"
         },
         "django-heroku": {
@@ -188,16 +232,7 @@
                 "sha256:5488aed8f8df5ec1d70f04b2114abc52ae6729748a176c453313834a9ee179c8",
                 "sha256:dc81cbf9775c6898a580f6f1f387c4777d12bd87abf0f5406018d32ccae71090"
             ],
-            "index": "pypi",
             "version": "==3.10.3"
-        },
-        "drf-jwt": {
-            "hashes": [
-                "sha256:5db687927968ca11d79bb879527e76d4f0e3e69b1cdf531b564bded901355fb3",
-                "sha256:82bb46ac82fc9b3702df3a374d196a9f6ab3f6b4ce4c619ae1ee7c98a9439a1e"
-            ],
-            "index": "pypi",
-            "version": "==1.13.3"
         },
         "hiredis": {
             "hashes": [
@@ -321,7 +356,6 @@
                 "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e",
                 "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"
             ],
-            "index": "pypi",
             "version": "==1.7.1"
         },
         "pytz": {
@@ -329,7 +363,6 @@
                 "sha256:1c557d7d0e871de1f5ccd5833f60fb2550652da6be2693c1e02300743d21500d",
                 "sha256:b02c06db6cf09c12dd25137e563b31700d3b80fcc4ad23abb7a315f2789819be"
             ],
-            "index": "pypi",
             "version": "==2019.3"
         },
         "six": {
@@ -345,7 +378,6 @@
                 "sha256:40afe6b8d4b1117e7dff5504d7a8ce07d9a1b15aeeade8a2d10f130a834f8177",
                 "sha256:7c3dca29c022744e95b547e867cee89f4fce4373f3549ccd8797d8eb52cdb873"
             ],
-            "index": "pypi",
             "version": "==0.3.0"
         },
         "twisted": {
@@ -424,6 +456,5 @@
             "index": "pypi",
             "version": "==4.6.0"
         }
-    },
-    "develop": {}
+    }
 }
