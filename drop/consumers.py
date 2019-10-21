@@ -114,40 +114,45 @@ class MessagesConsumer(WebsocketConsumer):
 
                 # we already have a query set paginated, return the requested page instead of hitting DB
                 else:
-                    page_num = max(1, json_data['page'])
+                    page_num = max(1, parse_int(json_data['page']))
 
                     if code == self.last_code and self.qs_cache:
-                        page_num = max(page_num, self.qs_cache.num_pages)
+                        page_num = min(page_num, self.qs_cache.num_pages)
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
                     # Messages by vote ranking
                     elif code == 2:
                         self.qs_cache = mf.retrieve_messages_ranked(geoloc=self.geoloc)
                         self.last_code = 2
+                        page_num = min(page_num, self.qs_cache.num_pages)
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
                     # Newest Messages
                     elif code == 3:
                         self.qs_cache = mf.retrieve_messages_new(geoloc=self.geoloc)
                         self.last_code = 3
+                        page_num = min(page_num, self.qs_cache.num_pages)
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
                     # Messages sorted randomly
                     elif code == 4:
                         self.qs_cache = mf.retrieve_messages_random(geoloc=self.geoloc)
                         self.last_code = 4
+                        page_num = min(page_num, self.qs_cache.num_pages)
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
                     # Messages within a lat/long area
                     elif code == 5:
                         self.qs_cache = mf.retrieve_messages_range(geoloc=self.geoloc, geoloc_range=parse_coord_range(json_data['data']))
                         self.last_code = 5
+                        page_num = min(page_num, self.qs_cache.num_pages)
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
                     # Messages posted by the user
                     elif code == 6:
                         self.qs_cache = mf.retrieve_user_messages(self.scope["user"].id)
                         self.last_code = 6
+                        page_num = min(page_num, self.qs_cache.num_pages)
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
         # handle exceptions

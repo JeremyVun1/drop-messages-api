@@ -72,3 +72,11 @@ def parse_coord_range(coord_range):
 		return result
 	except ValueError:
 		return 0.0
+
+
+def parse_int(x):
+	try:
+		result = int(x)
+		return result
+	except:
+		return 0
