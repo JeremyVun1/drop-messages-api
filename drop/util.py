@@ -55,7 +55,8 @@ def serialize_message(m):
 			"long": m.long,
 			"date": m.date.strftime("%d/%m/%Y"),
 			"message": m.message,
-			"votes": m.votes
+			"votes": m.votes,
+			"seen": m.seen
 		}
 		return result
 	return None

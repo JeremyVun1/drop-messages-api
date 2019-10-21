@@ -2,6 +2,7 @@
 # Jeremy Vun 2726092
 
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils.timezone import now
 
 
@@ -11,7 +12,8 @@ class Message(models.Model):
 	message = models.CharField(max_length=140)
 	date = models.DateTimeField(default=now)
 	votes = models.IntegerField(default=1)
-	# user = models.ForeignKey(User, on_delete=models.CASCADE)
+	seen = models.IntegerField(default=0)
+	author = models.ForeignKey(User, on_delete=models.CASCADE)
 
 	def __str__(self):
 		return f"({self.lat},{self.long}) - {self.message} [{self.votes}]"

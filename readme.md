@@ -1,36 +1,57 @@
-Drop message
+Drop Message
 ============
-- Create messages and drop them at a location
+API backend using REST and web sockets to allow clients to,
+- 'Drop' short messages at a geolocation for others to pick up and read
 - Pickup messages created by other people at the same location
 - Upvote and downvote messages
-- Messages are deleted when they are
-    1. Downvoted below 0
-    2. Expire
+- User accounts
 
-Websocket API
+When you drop a message, all connected clients in the same geolocation are notified and pick it up. Queries by category are paginated and cached. Call with next page number to get more data. No message duplicates within each geolocation block (lat,long) to 2 decimal places. Messages automatically deleted when they are downvoted below 0, or expire after 48 hours
+
+Websocket API (JSON)
 ===============
-1. Create message
-2. Get messages (paged)
+CLIENT REQUEST
+-------
+|API|category|data|page|token|lat|long|range|
+|---|------|------|----|-----|---|----|-----|
+|Required First message (Authentication)||||JWT|
+|Create message|0|"message"|
+|Change geolocation|1||||-90.0 < x > 90.0|-180.0 < x > 180.0|
+|Get top msg's|2||x >= 1|
+|Get newest msgs's|3||x >= 1|
+|Get random msgs's|4||x >= 1|
+|Get msgs's within radius|5||x >= 1||||x|
+
+SERVER RESPONSE
+---------
+|API|category|data|
+|---|--------|----|
+|socket status info|"socket"|" "|
+|post message status info|"post"|" "|
+|retrieved results|"retrieve"|" "|
+|errors|"error"|" "|
+|pushed notifications|"notification"|" "|
+
+Rest API endpoints (POST)
+===========
+|API|username|password|email|token|RESPONSE|
+|---|--------|--------|-----|-----|--------|
+|/api/register|"username"|"password"|"email"||username, hash, email|
+|/api/token|"username"|"password"|||JWT Token|
+|/api/verify||||"JWT token"|code 400 or code 200|
 
 
-Lazy Loading data flow
-==================
-- ws socket keeps updated messages in pagination
-- deliver next page
-- delivered pages cached on mobile
+Web Endpoints
+===========
+|API|Description|
+|---|-----------|
+|/web/portal|Web portal for testing stuff
+|/web/register|Register a new account
+|/web/login|Login
+|/web/logout|Logout
 
-
-Notifications
-===============
-- Long polling option?
-
-Users
-=============
-- POST registration
-- websocket login
-
-Authentication pattern
+User Authentication pattern
 ==============
-1. User sends POST request for a JWT fromm REST API endpoint
-2. User's first message via the websocket must include their JWT
-3. JWT is authenticated and user is added to the scope
+1. Register a user account
+2. Get JWT token from REST endpoint
+3. Use JWT token to authenticate websocket

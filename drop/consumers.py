@@ -18,6 +18,8 @@ from drop import message_facade as mf
 
 class MessagesConsumer(WebsocketConsumer):
     notified_id = 0
+    last_code = None
+    qs_cache = None
 
     # don't need to authenticate to connect, only when requesting data
     def connect(self):
@@ -60,39 +62,80 @@ class MessagesConsumer(WebsocketConsumer):
 
             json_data = json.loads(text_data)
 
-            # check authentication here
+            # user authentication
+            print(self.scope["user"].id)
             if self.scope["user"].id is None:
-                user = authenticate_token(json_data)
-                self.scope["user"] = user
-                self.send_message_to_client("socket", f"Authenticated successfully as {user.username}")
+                try:
+                    print('authenticating user')
+                    user = authenticate_token(json_data)
+                    self.scope["user"] = user
+                    self.send_message_to_client("socket", f"Authenticated successfully as {user.username}")
+                except:
+                    raise ValidationError("Invalid Access Token")
 
-            # user is authenticated already, receive messages and route them as normal
+            # user is authenticated, receive the client message and route based on category code
             else:
                 print(f"[RECEIVED]: {text_data}")
                 code = json_data['category']
+
+                # create message
                 if code == 0:
-                    m = mf.create_message(geoloc=self.geoloc, message=parse_message(json_data['data']))
-                    self.send_message_to_client("post", f"message created: {m}")
-                    self.notify_geoloc_group(m)
+                    m = mf.create_message(geoloc=self.geoloc, message=parse_message(json_data['data']), user_id=self.scope["user"].id)
+                    if m:
+                        self.send_message_to_client("post", f"message created: {m}")
+                        self.notify_geoloc_group(m)
+                    else:
+                        self.send_message_to_client("error", f"duplicate message found!")
+
+                # change geolocation
                 elif code == 1:
-                    qs = mf.retrieve_messages_ranked(geoloc=self.geoloc)
-                    self.send_retrieved_messages(qs)
-                elif code == 2:
-                    qs = mf.retrieve_messages_new(geoloc=self.geoloc)
-                    self.send_retrieved_messages(qs)
-                elif code == 3:
-                    qs = mf.retrieve_messages_random(geoloc=self.geoloc)
-                    self.send_retrieved_messages(qs)
-                elif code == 4:
-                    qs = mf.retrieve_messages_range(geoloc=self.geoloc, geoloc_range=parse_coord_range(json_data['range']))
-                    self.send_retrieved_messages(qs)
+                    new_geoloc = Geoloc(json_data['lat'], json_data['long'])
+                    if new_geoloc.is_valid():
+                        self.geoloc = new_geoloc
+                        self.send_message_to_client("socket", f"Changed Geolocation to ({new_geoloc.lat},{new_geoloc.long})")
+                    else:
+                        self.send_message_to_client("error", f"Cannot change to invalid geolocation")
+
+                # we already have a query set paginated, return the requested page instead of hitting DB
+                else:
+                    page_num = max(1, json_data['page'])
+
+                    if code == self.last_code and self.qs_cache:
+                        page_num = max(page_num, self.qs_cache.num_pages)
+                        self.send_retrieved_messages(self.qs_cache.page(page_num))
+
+                    # Messages by vote ranking
+                    elif code == 2:
+                        self.qs_cache = mf.retrieve_messages_ranked(geoloc=self.geoloc)
+                        self.last_code = 1
+                        self.send_retrieved_messages(self.qs_cache.page(page_num))
+
+                    # Newest Messages
+                    elif code == 3:
+                        self.qs_cache = mf.retrieve_messages_new(geoloc=self.geoloc)
+                        self.last_code = 2
+                        self.send_retrieved_messages(self.qs_cache.page(page_num))
+
+                    # Messages sorted randomly
+                    elif code == 4:
+                        self.qs_cache = mf.retrieve_messages_random(geoloc=self.geoloc)
+                        self.last_code = 3
+                        self.send_retrieved_messages(self.qs_cache.page(page_num))
+
+                    # Messages within a lat/long area
+                    elif code == 5:
+                        self.qs_cache = mf.retrieve_messages_range(geoloc=self.geoloc, geoloc_range=parse_coord_range(json_data['range']))
+                        self.last_code = 4
+                        self.send_retrieved_messages(self.qs_cache.page(page_num))
+
+        # handle exceptions
         except ValidationError as v:
-            self.send_message_to_client("error", "Invalid Access Token")
+            self.send_message_to_client("error", f"{v}")
             self.close()
         except Exception as e:
-            self.send_message_to_client("error", "error encountered, socket closed")
-            self.close()
+            self.send_message_to_client("error", "error encountered")
 
+    # notify whole group of a new message
     def notify_geoloc_group(self, message):
         if message:
             self.notified_id = message.pk
@@ -100,19 +143,20 @@ class MessagesConsumer(WebsocketConsumer):
                 str(self.geoloc),
                 {
                     # type specifies the function to be called when received
-                    'type': 'receive_new_message',
+                    'type': 'receive_notification',
                     'id': message.pk
                 }
             )
 
-    def receive_new_message(self, event):
+    # handle receiving a new message
+    def receive_notification(self, event):
         id = event['id']
         if self.notified_id == id:
             notified_id = 0
             return
 
         m = Message.objects.get(pk=id)
-        self.send_message_to_client("notification", serialize_message(m))
+        self.send_message_to_client("notify", serialize_message(m))
 
     # send message query set back to the client
     def send_retrieved_messages(self, qs):
@@ -142,42 +186,3 @@ def authenticate_token(json_data):
         return valid_data['user']
     except:
         raise ValidationError("Invalid access token")
-'''
-AUTH
-channels.auth.login
-channels.auth.logout
-
-login(scope, user, backend=None)
-scope must have the user's session
-
-TOKENS
-customer middleware to intercept http headers, check if authorization exists in header
-{
-    authorization: ['Token', token_key]
-} 
-
-LOOK INTO JWT
-single auth
-- check if user in the scope = authenticated
-- if no user, try get a token and auth
-
-def receive(self, text_data=None, bytes_data=None):
-    if self.scope['user'].id:
-        pass
-    else:
-        try:
-            # It means user is not authenticated yet.
-            data = json.loads(text_data)
-            if 'token' in data.keys():
-                token = data['token']
-                user = fetch_user_from_token(token)
-                self.scope['user'] = user
-                
-        except Exception as e:
-            # Data is not valid, so close it.
-            print(e)
-            pass
-
-    if not self.scope['user'].id:
-        self.close()
-'''
