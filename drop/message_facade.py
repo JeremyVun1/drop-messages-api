@@ -13,14 +13,11 @@ def create_message(geoloc, message, user_id):
 		if geoloc and geoloc.is_valid() and message:
 			# check for duplicate messages at the same geolocation
 			qs = Message.objects.filter(lat=geoloc.lat, long=geoloc.long, message__iexact=message)
-			print(qs)
 
 			if not qs.exists():
-				print("creating message")
 				user = User.objects.get(pk=user_id)  # get author
 				m = Message(lat=geoloc.lat, long=geoloc.long, message=message, author=user)
 				m.save()
-				print(m)
 				return m
 		else:
 			return None

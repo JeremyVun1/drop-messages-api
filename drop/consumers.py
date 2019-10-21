@@ -63,10 +63,8 @@ class MessagesConsumer(WebsocketConsumer):
             json_data = json.loads(text_data)
 
             # user authentication
-            print(self.scope["user"].id)
             if self.scope["user"].id is None:
                 try:
-                    print('authenticating user')
                     user = authenticate_token(json_data)
                     self.scope["user"] = user
                     self.send_message_to_client("socket", f"Authenticated successfully as {user.username}")
