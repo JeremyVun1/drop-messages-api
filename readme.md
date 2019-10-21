@@ -28,3 +28,9 @@ Users
 =============
 - POST registration
 - websocket login
+
+Authentication pattern
+==============
+1. User sends POST request for a JWT fromm REST API endpoint
+2. User's first message via the websocket must include their JWT
+3. JWT is authenticated and user is added to the scope

@@ -24,3 +24,6 @@ Twisted==19.7.0
 txaio==18.8.1
 whitenoise==4.1
 zope.interface==4.5.0
+djangorestframework==3.10.3
+drf-jwt==1.13.3
+djangorestframework-jwt==1.11.0

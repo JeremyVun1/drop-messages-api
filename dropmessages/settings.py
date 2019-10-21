@@ -36,7 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     "drop",
+    "rest_framework",
     "channels",
 ]
 
@@ -117,6 +119,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
+# REST FRAMEWORK
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    )
+}
 
 # DJANGO CHANNELS
 ASGI_APPLICATION = "dropmessages.routing.application"

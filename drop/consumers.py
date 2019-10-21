@@ -1,8 +1,17 @@
-# chat/consumers.py
+# websocket server consumer
+# Jeremy vun 2726092
+
+# websocket imports
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
 
+# authentication imports
+from django.contrib.auth.models import AnonymousUser
+from rest_framework.exceptions import ValidationError
+from rest_framework_jwt.serializers import VerifyAuthTokenSerializer
+
+# business imports
 from .util import *
 from drop import message_facade as mf
 
@@ -10,22 +19,26 @@ from drop import message_facade as mf
 class MessagesConsumer(WebsocketConsumer):
     notified_id = 0
 
+    # don't need to authenticate to connect, only when requesting data
     def connect(self):
-        print("connecting!")
-        # TODO authentication
-        # if self.scope['user'].is_authenticated:
+        self.accept()
+        try:
+            # bind consumer instance to a geolocation
+            self.geoloc = parse_geoloc(self.scope['url_route']['kwargs']['geoloc'])
+            if self.geoloc is None:
+                raise ValueError("Invalid Geolocation")
 
-        # bind consumer to a geolocation
-        self.geoloc = parse_geoloc(self.scope['url_route']['kwargs']['geoloc'])
-        print(self.geoloc)
-
-        if self.geoloc and self.geoloc.is_valid():
-            async_to_sync(self.channel_layer.group_add)(
-                str(self.geoloc),
-                self.channel_name
-            )
-            self.accept()
-            self.send_message_to_client(category="socket", data="websocket accepted")
+            print(f"socket opened at [{self.geoloc}]")
+            if self.geoloc and self.geoloc.is_valid():
+                async_to_sync(self.channel_layer.group_add)(
+                    str(self.geoloc),
+                    self.channel_name
+                )
+                self.send_message_to_client("socket", "Socket is open!")
+        except Exception as e:
+            print("EXCEPTION OPENING SOCKET")
+            self.send_message_to_client("error", str(e))
+            self.close()
 
     # unsubscribe us from the layer group after we disconnect
     def disconnect(self, close_code):
@@ -43,29 +56,44 @@ class MessagesConsumer(WebsocketConsumer):
     # noinspection PyMethodOverriding
     def receive(self, text_data):
         try:
+            if self.geoloc is None:
+                return
+
             print(f"received: {text_data}")
             json_data = json.loads(text_data)
-            code = json_data['category']
-            # print(f"received: {code}, {json_data['data']}")
 
-            if code == 0:
-                m = mf.create_message(geoloc=self.geoloc, message=parse_message(json_data['data']))
-                self.notify_geoloc_group(m)
-                self.send_message_to_client("post", f"message created: {m}")
-            elif code == 1:
-                qs = mf.retrieve_messages_ranked(geoloc=self.geoloc)
-                self.send_retrieved_messages(qs)
-            elif code == 2:
-                qs = mf.retrieve_messages_new(geoloc=self.geoloc)
-                self.send_retrieved_messages(qs)
-            elif code == 3:
-                qs = mf.retrieve_messages_random(geoloc=self.geoloc)
-                self.send_retrieved_messages(qs)
-            elif code == 4:
-                qs = mf.retrieve_messages_range(geoloc=self.geoloc, geoloc_range=parse_coord_range(json_data['range']))
-                self.send_retrieved_messages(qs)
-        except Exception:
-            print("RECEIVE MESSAGE ERROR")
+            # check authentication here
+            if self.scope["user"].id is None:
+                user = authenticate_token(json_data)
+                self.scope["user"] = user
+                print(user)
+                self.send_message_to_client("socket", f"Authenticated successfully as {user.username}")
+
+            # user is authenticated already, receive messages and route them as normal
+            else:
+                code = json_data['category']
+                if code == 0:
+                    m = mf.create_message(geoloc=self.geoloc, message=parse_message(json_data['data']))
+                    self.send_message_to_client("post", f"message created: {m}")
+                    self.notify_geoloc_group(m)
+                elif code == 1:
+                    qs = mf.retrieve_messages_ranked(geoloc=self.geoloc)
+                    self.send_retrieved_messages(qs)
+                elif code == 2:
+                    qs = mf.retrieve_messages_new(geoloc=self.geoloc)
+                    self.send_retrieved_messages(qs)
+                elif code == 3:
+                    qs = mf.retrieve_messages_random(geoloc=self.geoloc)
+                    self.send_retrieved_messages(qs)
+                elif code == 4:
+                    qs = mf.retrieve_messages_range(geoloc=self.geoloc, geoloc_range=parse_coord_range(json_data['range']))
+                    self.send_retrieved_messages(qs)
+        except ValidationError as v:
+            self.send_message_to_client("error", "Invalid Access Token")
+            self.close()
+        except Exception as e:
+            self.send_message_to_client("error", "error encountered, socket closed")
+            self.close()
 
     def notify_geoloc_group(self, message):
         if message:
@@ -110,6 +138,13 @@ class MessagesConsumer(WebsocketConsumer):
         }))
 
 
+def authenticate_token(json_data):
+    try:
+        token = json_data['token']
+        valid_data = VerifyAuthTokenSerializer().validate({"token": token})
+        return valid_data['user']
+    except:
+        raise ValidationError("Invalid access token")
 '''
 AUTH
 channels.auth.login

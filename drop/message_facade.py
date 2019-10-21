@@ -8,9 +8,14 @@ from .util import Geoloc
 
 def create_message(geoloc, message):
 	if geoloc and geoloc.is_valid() and message:
-		m = Message(lat=geoloc.lat, long=geoloc.long, message=message)
-		m.save()
-		return m
+
+		# check for duplicate messages at the same geolocation
+		qs = Message.objects.filter(lat=geoloc.lat, long=geoloc.long, message=message)
+
+		if not qs.exists():
+			m = Message(lat=geoloc.lat, long=geoloc.long, message=message)
+			m.save()
+			return m
 	else:
 		return None
 

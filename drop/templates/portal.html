@@ -15,25 +15,21 @@
     <!-- INPUT -->
     <div class="container">
         <div class="content-block">
+            <h2 class="content-title">ENTER YOUR ACCESS TOKEN HERE</h2>
+            <input id="token" type="text" size="100" placeholder="Access Token..."/>
+        </div>
+        <div class="content-block">
             <h2 class="content-title">START SOCKET</h2>
             <div class="row">
                 <div class="row">
-                    <input id="login_lat" type="text" placeholder="Latitude..."/><br />
-                    <input id="login_long" type="text" placeholder="Longitude..."/><br />
+                    <input id="socket_lat" type="text" placeholder="Latitude..."/><br />
+                    <input id="socket_long" type="text" placeholder="Longitude..."/><br />
                 </div>
-                <input id="login_username" type="text" placeholder="username"/>
-                <input id="login_password" type="password" placeholder="password"/>
                 <input id="socket_output" disabled="true" size="50" type="text" placeholder="socket status..." />
-                {% if user.is_authenticated %}
-                    <p>Logged in as {{ user.username }}</p>
-                {% else %}
-                    <p>Not logged in</p>
-                {% endif %}
-                <p></p>
             </div>
             <div class="row">
-                <input id="login_submit" type="button" value="Start Connection"/>
-                <input id="logout_submit" type="button" value="End Connection"/>
+                <input id="socket_open_submit" type="button" value="Start Connection"/>
+                <input id="socket_close_submit" type="button" value="End Connection"/>
             </div>
         </div>
 
@@ -63,7 +59,9 @@
 
 
     <script>
-    //util functions for lazy people
+    /////////////////////
+    // util functions for lazy people
+    /////////////////////
     function getDom(id) {
         return document.getElementById(id);
     }
@@ -74,14 +72,25 @@
     //get web socket protocol
     var protocol = (window.location.protocol === "https:") ? "wss:" : "ws:";
     var webSocket = null;
+    var response = "no response";
+    var get_token_url = window.location.host + "/api/token/";
 
-    // 1. Login / authenticate
-    // TODO - ACTUAL TOKEN AUTH
-    getDom("login_submit").onclick = function(e) {
-        var geoloc = getVal("login_lat") + "," + getVal("login_long");
+    /////////////////////
+    // 1. OPEN-CLOSE web socket connection
+    /////////////////////
+    getDom("socket_open_submit").onclick = function(e) {
+        var geoloc = getVal("socket_lat") + "," + getVal("socket_long");
         webSocket = new WebSocket(protocol + "//" + window.location.host + "/ws/" + geoloc + "/");
 
         // register event handlers
+        // Send the access token to authenticate ourselves after the socket is opened
+        webSocket.onopen = function(e) {
+            webSocket.send(JSON.stringify({
+                "token": getVal("token")
+            }));
+        }
+
+        // response to messages from the server
         webSocket.onmessage = function(e) {
             var json_data = JSON.parse(e.data);
             var category = json_data.category;
@@ -108,12 +117,20 @@
             outputDom.value = JSON.stringify(data, null, "\t");
         };
 
+        // websocket closed
         webSocket.onclose = function(e) {
             getDom("socket_output").value = "Socket closed unexpectedly";
         };
     };
 
+    // close the websocket
+    getDom("socket_close_submit").onclick = function(e) {
+        webSocket.close();
+    };
+
+    /////////////////////
     // 2. Post a message
+    /////////////////////
     getDom("post_submit").onclick = function(e) {
         var msg = getDom("post_message");
         webSocket.send(JSON.stringify({
@@ -131,8 +148,9 @@
         }));
     };
 
-
-    // click shortcuts
+    /////////////////////
+    // 3. click shortcuts
+    /////////////////////
     getDom("post_message").onkeyup = function(e) {
         if (e.keyCode === 13) {
             getDom("post_submit").click();
@@ -145,9 +163,9 @@
         }
     };
 
-    getDom("login_password").onkeyup = function(e) {
+    getDom("socket_long").onkeyup = function(e) {
         if (e.keyCode === 13) {
-            getDom("login_submit").click();
+            getDom("socket_open_submit").click();
         }
     };
     </script>

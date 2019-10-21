@@ -1,5 +1,6 @@
 # utility functions
 # Jeremy Vun 2726092
+
 from drop.models import Message
 from .constants import GEOLOC_RESOLUTION, MAX_MESSAGE_LENGTH, MAX_RANGE
 

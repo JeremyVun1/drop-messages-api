@@ -1,8 +1,8 @@
+# Views for web based end points
+# Jeremy Vun 2726092
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
-from django.utils.safestring import mark_safe
-import json
-
 
 # 404
 def no_resource(request):
