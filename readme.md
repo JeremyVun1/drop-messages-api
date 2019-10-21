@@ -8,7 +8,7 @@ API backend using REST and web sockets to allow clients to,
 
 When you drop a message, all connected clients in the same geolocation are notified and pick it up. Queries by category are paginated and cached. Call with next page number to get more data. No message duplicates within each geolocation block (lat,long) to 2 decimal places. Messages automatically deleted when they are downvoted below 0, or expire after 48 hours
 
-[https://drop-messages.herokuapp.com/](https://drop-messages.herokuapp.com/)
+[https://drop-messages.herokuapp.com/web/portal/](https://drop-messages.herokuapp.com/web/portal/)
 
 Websocket API (JSON)
 ===============
