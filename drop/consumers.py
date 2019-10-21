@@ -28,7 +28,7 @@ class MessagesConsumer(WebsocketConsumer):
             if self.geoloc is None:
                 raise ValueError("Invalid Geolocation")
 
-            print(f"socket opened at [{self.geoloc}]")
+            print(f"[SOCKET] Opened @[{self.geoloc}]")
             if self.geoloc and self.geoloc.is_valid():
                 async_to_sync(self.channel_layer.group_add)(
                     str(self.geoloc),
@@ -36,7 +36,6 @@ class MessagesConsumer(WebsocketConsumer):
                 )
                 self.send_message_to_client("socket", "Socket is open!")
         except Exception as e:
-            print("EXCEPTION OPENING SOCKET")
             self.send_message_to_client("error", str(e))
             self.close()
 
@@ -59,18 +58,17 @@ class MessagesConsumer(WebsocketConsumer):
             if self.geoloc is None:
                 return
 
-            print(f"received: {text_data}")
             json_data = json.loads(text_data)
 
             # check authentication here
             if self.scope["user"].id is None:
                 user = authenticate_token(json_data)
                 self.scope["user"] = user
-                print(user)
                 self.send_message_to_client("socket", f"Authenticated successfully as {user.username}")
 
             # user is authenticated already, receive messages and route them as normal
             else:
+                print(f"[RECEIVED]: {text_data}")
                 code = json_data['category']
                 if code == 0:
                     m = mf.create_message(geoloc=self.geoloc, message=parse_message(json_data['data']))
@@ -118,7 +116,6 @@ class MessagesConsumer(WebsocketConsumer):
 
     # send message query set back to the client
     def send_retrieved_messages(self, qs):
-        print(qs)
         if qs is not None:
             result = []
             for m in qs:

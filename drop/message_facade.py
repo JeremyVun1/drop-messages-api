@@ -40,12 +40,9 @@ def retrieve_messages_random(geoloc):
 
 
 def retrieve_messages_range(geoloc, geoloc_range):
-	print("Retrieving by range")
 	if geoloc and geoloc.is_valid():
 		geoloc_min = Geoloc(geoloc.lat - geoloc_range / 2, geoloc.long - geoloc_range)
 		geoloc_max = Geoloc(geoloc.lat + geoloc_range / 2, geoloc.long + geoloc_range)
-		print(f"geoloc_min: {geoloc_min}")
-		print(f"geoloc_max: {geoloc_max}")
 
 		result = Message.objects.filter(lat__lte=geoloc_max.lat, lat__gte=geoloc_min.lat, long__lte=geoloc_max.long, long__gte=geoloc_min.long)
 		return result

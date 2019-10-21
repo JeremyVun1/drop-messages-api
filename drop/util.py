@@ -57,7 +57,6 @@ def serialize_message(m):
 			"message": m.message,
 			"votes": m.votes
 		}
-		print(result) # TODO testing print
 		return result
 	return None
 
