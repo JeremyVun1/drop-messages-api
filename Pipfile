@@ -12,6 +12,7 @@ django-heroku = "*"
 channels = "*"
 channels-redis = "*"
 drf-jwt = "*"
+djangorestframework-jwt = "*"
 
 [requires]
 python_version = "3.7"
