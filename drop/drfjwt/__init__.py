@@ -1,3 +1,5 @@
+# NOTE: have to hard include this deppendency because heroku isn't playing nice and won't properly pip install this
+
 # -*- coding: utf-8 -*-
 
 __title__ = 'drf-jwt'
