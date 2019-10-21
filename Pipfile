@@ -39,6 +39,9 @@ Twisted = "==19.7.0"
 
 [packages]
 drf-jwt = "==1.13.3"
+django-heroku = "*"
+channels = "*"
+channels-redis = "*"
 
 [requires]
 python_version = "3.6"
