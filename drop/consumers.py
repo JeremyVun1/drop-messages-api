@@ -30,7 +30,7 @@ class MessagesConsumer(WebsocketConsumer):
             if self.geoloc is None:
                 raise ValueError("Invalid Geolocation")
 
-            print(f"[SOCKET] Opened @[{self.geoloc}]")
+            print(f"@[SOCK] Opened @({self.geoloc})")
             if self.geoloc and self.geoloc.is_valid():
                 async_to_sync(self.channel_layer.group_add)(
                     str(self.geoloc),
@@ -73,7 +73,7 @@ class MessagesConsumer(WebsocketConsumer):
 
             # user is authenticated, receive the client message and route based on category code
             else:
-                print(f"[RECEIVED]: {text_data}")
+                print(f">>[REC][{self.scope['user'].username}]: {text_data}")
                 code = json_data['category']
 
                 # create message
@@ -94,6 +94,24 @@ class MessagesConsumer(WebsocketConsumer):
                     else:
                         self.send_message_to_client("error", f"Cannot change to invalid geolocation")
 
+                # Upvote
+                elif code == 7:
+                    msg_id = int(json_data["data"])
+                    votes = mf.upvote(msg_id)
+                    if votes is None:
+                        self.send_message_to_client("error", "Message not found")
+                    else:
+                        self.send_message_to_client("post", { "id": msg_id, "votes": votes })
+
+                # Downvote
+                elif code == 8:
+                    msg_id = int(json_data["data"])
+                    votes = mf.downvote(msg_id)
+                    if votes is None:
+                        self.send_message_to_client("error", "Message not found")
+                    else:
+                        self.send_message_to_client("post", {"id": msg_id, "votes": votes})
+
                 # we already have a query set paginated, return the requested page instead of hitting DB
                 else:
                     page_num = max(1, json_data['page'])
@@ -105,25 +123,31 @@ class MessagesConsumer(WebsocketConsumer):
                     # Messages by vote ranking
                     elif code == 2:
                         self.qs_cache = mf.retrieve_messages_ranked(geoloc=self.geoloc)
-                        self.last_code = 1
+                        self.last_code = 2
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
                     # Newest Messages
                     elif code == 3:
                         self.qs_cache = mf.retrieve_messages_new(geoloc=self.geoloc)
-                        self.last_code = 2
+                        self.last_code = 3
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
                     # Messages sorted randomly
                     elif code == 4:
                         self.qs_cache = mf.retrieve_messages_random(geoloc=self.geoloc)
-                        self.last_code = 3
+                        self.last_code = 4
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
                     # Messages within a lat/long area
                     elif code == 5:
-                        self.qs_cache = mf.retrieve_messages_range(geoloc=self.geoloc, geoloc_range=parse_coord_range(json_data['range']))
-                        self.last_code = 4
+                        self.qs_cache = mf.retrieve_messages_range(geoloc=self.geoloc, geoloc_range=parse_coord_range(json_data['data']))
+                        self.last_code = 5
+                        self.send_retrieved_messages(self.qs_cache.page(page_num))
+
+                    # Messages posted by the user
+                    elif code == 6:
+                        self.qs_cache = mf.retrieve_user_messages(self.scope["user"].id)
+                        self.last_code = 6
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
         # handle exceptions
@@ -170,7 +194,7 @@ class MessagesConsumer(WebsocketConsumer):
 
     # send a data frame to the client
     def send_message_to_client(self, category, data):
-        print(f"[SEND] category: {category}, data: {data}")
+        print(f"<<[SND][{self.scope['user'].username}]: cat: {category}, data: {data}")
         self.send(text_data=json.dumps({
             "category": category,
             "data": data

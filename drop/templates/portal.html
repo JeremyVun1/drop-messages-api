@@ -37,13 +37,21 @@
             <h2 class="content-title">POST MESSAGE</h2>
             <textarea id="post_message" placeholder="message..." cols="150" rows="3"></textarea><br />
             <input id="post_submit" type="button" value="Post Message"/><br/>
-            <textarea id="post_output" rows="2" cols="100" disabled="true" placeholder="output here..."></textarea>
+            <textarea id="post_output" rows="4" cols="100" disabled="true" placeholder="output here..."></textarea>
         </div>
 
         <div class="content-block">
             <h2 class="content-title">RETRIEVE MESSAGES</h2>
-            <input id="retrieve_range" type="number" placeholder="Range"/><br />
+            <input id="retrieve_range" type="number" placeholder="Range"/>
+            <input id="retrieve_page_num" type="number" placeholder="Page Number..."/><br />
             <input id="retrieve_submit" type="button" value="Retrieve Messages"/><br />
+        </div>
+
+        <div class="content-block">
+            <h2 class="content-title">VOTE</h2>
+            <input id="vote_message_id" type="number" placeholder="message id..."/><br />
+            <input id="vote_upvote_submit" type="button" value="Upvote"/>
+            <input id="vote_downvote_submit" type="button" value="Downvote"/>
         </div>
 
         <div class="content-block">
@@ -140,17 +148,36 @@
         msg.value = "";
     };
 
+    /////////////////////
     // 3. Retrieve messages by range (code: 4)
+    /////////////////////
     getDom("retrieve_submit").onclick = function(e) {
         webSocket.send(JSON.stringify({
-            "category": 4,
-            "page": 1,
-            "range": getVal("retrieve_range"),
+            "category": 5,
+            "page": getVal("retrieve_page_num"),
+            "data": getVal("retrieve_range"),
         }));
     };
 
     /////////////////////
-    // 3. click shortcuts
+    // 3. Message voting
+    /////////////////////
+    getDom("vote_upvote_submit").onclick = function(e) {
+        webSocket.send(JSON.stringify({
+            "category": 7,
+            "data": getVal("vote_message_id")
+        }));
+    };
+
+    getDom("vote_downvote_submit").onclick = function(e) {
+        webSocket.send(JSON.stringify({
+            "category": 8,
+            "data": getVal("vote_message_id")
+        }));
+    };
+
+    /////////////////////
+    // 4. click shortcuts
     /////////////////////
     getDom("post_message").onkeyup = function(e) {
         if (e.keyCode === 13) {

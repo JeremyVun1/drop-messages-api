@@ -14,22 +14,25 @@ Websocket API (JSON)
 ===============
 CLIENT REQUEST
 -------
-|API|category|data|page|token|lat|long|range|
-|---|------|------|----|-----|---|----|-----|
+|API|category|data|page|token|lat|long|
+|---|------|------|----|-----|---|----|
 |Required First message (Authentication)||||JWT|
 |Create message|0|"message"|
 |Change geolocation|1||||-90.0 < x > 90.0|-180.0 < x > 180.0|
 |Get top msg's|2||x >= 1|
 |Get newest msgs's|3||x >= 1|
 |Get random msgs's|4||x >= 1|
-|Get msgs's within radius|5||x >= 1||||x|
+|Get msgs's within radius|5|x|x >= 1|||||
+|Get my msg's|6||x >= 1|
+|Upvote|7|message id|
+|Downvote|8|message_id|
 
 SERVER RESPONSE
 ---------
 |API|category|data|
 |---|--------|----|
 |socket status info|"socket"|" "|
-|post message status info|"post"|" "|
+|response about information posting|"post"|" "|
 |retrieved results|"retrieve"|" "|
 |errors|"error"|" "|
 |pushed notifications|"notification"|" "|

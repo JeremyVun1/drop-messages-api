@@ -69,6 +69,16 @@ def retrieve_messages_range(geoloc, geoloc_range):
 		return None
 
 
+def retrieve_user_messages(user_id):
+	try:
+		if user_id and isinstance(user_id, int) and user_id >= 1:
+			user = User.objects.get(pk=user_id)
+			qs = Message.objects.filter(author=user)
+			return Paginator(qs, PAGE_SIZE)
+	except:
+		return None
+
+
 def upvote(id):
 	try:
 		m = Message.objects.get(pk=id)
