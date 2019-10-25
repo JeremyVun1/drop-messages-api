@@ -204,12 +204,16 @@ class MessagesConsumer(WebsocketConsumer):
             "category": category,
             "data": data
         }))
+        print("MESSAGE SENT")
 
 
 def authenticate_token(json_data):
+    print("authenticating token...")
     try:
         token = json_data['token']
+        print(token)
         valid_data = VerifyAuthTokenSerializer().validate({"token": token})
+        print("valid data: ", valid_data)
         return valid_data['user']
     except:
         raise ValidationError("Invalid access token")
