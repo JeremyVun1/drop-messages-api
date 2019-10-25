@@ -65,7 +65,7 @@ class MessagesConsumer(WebsocketConsumer):
             # user authentication
             if self.scope["user"].id is None:
                 try:
-                    print(f">>[REC]{text_data}")
+                    print(f">>[REC][Anon]: {text_data}")
                     user = authenticate_token(json_data)
                     self.scope["user"] = user
                     self.send_message_to_client("socket", f"Authenticated successfully as {user.username}")
@@ -205,16 +205,13 @@ class MessagesConsumer(WebsocketConsumer):
             "category": category,
             "data": data
         }))
-        print("MESSAGE SENT")
 
 
 def authenticate_token(json_data):
     print("authenticating token...")
     try:
         token = json_data['token']
-        print(token)
         valid_data = VerifyAuthTokenSerializer().validate({"token": token})
-        print("valid data: ", valid_data)
         return valid_data['user']
     except:
         raise ValidationError("Invalid access token")
