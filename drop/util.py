@@ -30,7 +30,9 @@ class Geoloc:
 # lat,long
 def parse_geoloc(geoloc_str):
 	try:
+		print(f"parging geoloc string: {geoloc_str}")
 		geoloc = geoloc_str.split(',')
+		print(f"parsed: {geoloc}")
 		if len(geoloc) != 2:
 			return None
 
@@ -39,6 +41,7 @@ def parse_geoloc(geoloc_str):
 		if geoloc.is_valid():
 			return geoloc
 		else:
+			print("geoloc not valid")
 			return None
 	except ValueError:
 		return None
