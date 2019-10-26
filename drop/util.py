@@ -20,7 +20,7 @@ class Geoloc:
 		)
 
 	def get_block_string(self):
-		return str(self.getBlock)
+		return str(self.get_block())
 
 	def __str__(self):
 		return f"{round(self.lat, GEOLOC_RESOLUTION)},{round(self.long, GEOLOC_RESOLUTION)}"
