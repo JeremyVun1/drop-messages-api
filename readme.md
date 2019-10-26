@@ -30,6 +30,7 @@ e.g. Melbourne: https://drop-messages.herokuapp.com/ws/37.81,144.96/
 |Get my msg's|6||x >= 1|
 |Upvote|7|message id|
 |Downvote|8|message_id|
+|Disconnect|9|
 
 SERVER RESPONSE
 ---------
