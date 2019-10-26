@@ -7,12 +7,11 @@ from .constants import GEOLOC_RESOLUTION, MAX_MESSAGE_LENGTH, MAX_RANGE
 
 class Geoloc:
 	def __init__(self, lat, long):
-		self.lat = lat
-		self.long = long
+		self.lat = float(lat)
+		self.long = float(long)
 
 	def is_valid(self):
-		return isinstance(self.lat, float) and isinstance(self.long, float)\
-			   and -90 <= self.lat <= 90 and 180 >= self.long >= -180
+		return -90 <= self.lat <= 90 and 180 >= self.long >= -180
 
 	def get_block(self):
 		return Geoloc(

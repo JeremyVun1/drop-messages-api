@@ -44,10 +44,11 @@ class MessagesConsumer(WebsocketConsumer):
 
     # unsubscribe us from the layer group after we disconnect
     def disconnect(self, close_code):
-        async_to_sync(self.channel_layer.group_discard)(
-            self.geoloc.get_block_string(),
-            self.channel_name
-        )
+        if self.geoloc:
+            async_to_sync(self.channel_layer.group_discard)(
+                self.geoloc.get_block_string(),
+                self.channel_name
+            )
 
     # Route client request according to category code
     # 0. post message
