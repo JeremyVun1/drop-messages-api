@@ -30,13 +30,14 @@ class MessagesConsumer(WebsocketConsumer):
             if self.geoloc is None:
                 raise ValueError("Invalid Geolocation")
 
-            print(f"@[SOCK] Opened @({self.geoloc})")
+            print(f"@[SOCK] Opened @({self.geoloc.get_block_string()})")
+            # add to a geoblock layer group
             if self.geoloc and self.geoloc.is_valid():
                 async_to_sync(self.channel_layer.group_add)(
-                    str(self.geoloc),
+                    self.geoloc.get_block_string(),
                     self.channel_name
                 )
-                self.send_message_to_client("socket", "Socket is open!")
+                self.send_message_to_client("socket", "open")
         except Exception as e:
             self.send_message_to_client("error", str(e))
             self.close()
@@ -44,7 +45,7 @@ class MessagesConsumer(WebsocketConsumer):
     # unsubscribe us from the layer group after we disconnect
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
-            str(self.geoloc),
+            self.geoloc.get_block_string(),
             self.channel_name
         )
 
@@ -77,6 +78,11 @@ class MessagesConsumer(WebsocketConsumer):
                 print(f">>[REC][{self.scope['user'].username}]: {text_data}")
                 code = json_data['category']
 
+                # client wishes to close the socket
+                if code == 9:
+                    self.send_message_to_client("socket", "closed")
+                    self.close()
+
                 # create message
                 if code == 0:
                     m = mf.create_message(geoloc=self.geoloc, message=parse_message(json_data['data']), user_id=self.scope["user"].id)
@@ -90,10 +96,22 @@ class MessagesConsumer(WebsocketConsumer):
                 elif code == 1:
                     new_geoloc = Geoloc(json_data['lat'], json_data['long'])
                     if new_geoloc.is_valid():
+                        # leave current group
+                        async_to_sync(self.channel_layer.group_discard)(
+                            self.geoloc.get_block_string(),
+                            self.channel_name
+                        )
+
+                        # join new group
                         self.geoloc = new_geoloc
-                        self.send_message_to_client("socket", f"Changed Geolocation to ({new_geoloc.lat},{new_geoloc.long})")
+                        async_to_sync(self.channel_layer.group_add)(
+                            self.geoloc.get_block_string(),
+                            self.channel_name
+                        )
+
+                        self.send_message_to_client("socket", f"{new_geoloc.get_block_string()}")
                     else:
-                        self.send_message_to_client("error", f"Cannot change to invalid geolocation")
+                        self.send_message_to_client("error", f"Invalid geolocation")
 
                 # Upvote
                 elif code == 7:

@@ -14,8 +14,17 @@ class Geoloc:
 		return isinstance(self.lat, float) and isinstance(self.long, float)\
 			   and -90 <= self.lat <= 90 and 180 >= self.long >= -180
 
+	def get_block(self):
+		return Geoloc(
+			round(self.lat, GEOLOC_RESOLUTION),
+			round(self.long, GEOLOC_RESOLUTION)
+		)
+
+	def get_block_string(self):
+		return str(self.getBlock)
+
 	def __str__(self):
-		return f"{round(self.lat, GEOLOC_RESOLUTION)}-{round(self.long, GEOLOC_RESOLUTION)}"
+		return f"{round(self.lat, GEOLOC_RESOLUTION)},{round(self.long, GEOLOC_RESOLUTION)}"
 
 
 # lat,long
@@ -25,10 +34,7 @@ def parse_geoloc(geoloc_str):
 		if len(geoloc) != 2:
 			return None
 
-		geoloc = Geoloc(
-			round(float(geoloc[0]), GEOLOC_RESOLUTION),
-			round(float(geoloc[1]), GEOLOC_RESOLUTION)
-		)
+		geoloc = Geoloc(geoloc[0], geoloc[1])
 
 		if geoloc.is_valid():
 			return geoloc

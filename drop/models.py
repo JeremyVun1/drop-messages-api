@@ -9,6 +9,8 @@ from django.utils.timezone import now
 class Message(models.Model):
 	lat = models.FloatField()
 	long = models.FloatField()
+	lat_block = models.FloatField()
+	long_block = models.FloatField()
 	message = models.CharField(max_length=140)
 	date = models.DateTimeField(default=now)
 	votes = models.IntegerField(default=1)
