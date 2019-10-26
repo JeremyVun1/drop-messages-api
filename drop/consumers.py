@@ -34,7 +34,7 @@ class MessagesConsumer(WebsocketConsumer):
             # add to a geoblock layer group
             if self.geoloc and self.geoloc.is_valid():
                 async_to_sync(self.channel_layer.group_add)(
-                    self.geoloc.get_block_string(),
+                    self.geoloc.get_block_name(),
                     self.channel_name
                 )
                 self.send_message_to_client("socket", "open")
@@ -46,7 +46,7 @@ class MessagesConsumer(WebsocketConsumer):
     def disconnect(self, close_code):
         if self.geoloc:
             async_to_sync(self.channel_layer.group_discard)(
-                self.geoloc.get_block_string(),
+                self.geoloc.get_block_name(),
                 self.channel_name
             )
 

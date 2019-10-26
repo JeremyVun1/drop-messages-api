@@ -19,6 +19,10 @@ class Geoloc:
 			round(self.long, GEOLOC_RESOLUTION)
 		)
 
+	def get_block_name(self):
+		block = self.get_block()
+		return f"{block.lat}-{block.long}"
+
 	def get_block_string(self):
 		return str(self.get_block())
 
