@@ -78,7 +78,7 @@ class MessagesConsumer(WebsocketConsumer):
                     else:
                         raise ValueError("Invalid Geolocation")
                 except:
-                    raise ValidationError("Invalid Access Token")
+                    raise TokenError("Invalid Access Token")
 
             # user is authenticated, receive the client message and route based on category code
             else:
@@ -253,7 +253,7 @@ class MessagesConsumer(WebsocketConsumer):
                     result.append(m_json)
             self.send_message_to_client("retrieve", result)
         else:
-            self.send_message_to_client("retrieve", {})
+            self.send_message_to_client("retrieve", "")
 
     # send a data frame to the client
     def send_message_to_client(self, category, data):

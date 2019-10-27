@@ -57,6 +57,7 @@ def serialize_message(m):
 	if isinstance(m, Message):
 		result = {
 			"id": m.pk,
+			"author": m.author.username,
 			"lat": m.lat,
 			"long": m.long,
 			"date": m.date.strftime("%d/%m/%Y"),
