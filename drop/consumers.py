@@ -25,19 +25,7 @@ class MessagesConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
         try:
-            # bind consumer instance to a geolocation
-            self.geoloc = parse_geoloc(self.scope['url_route']['kwargs']['geoloc'])
-            if self.geoloc is None:
-                raise ValueError("Invalid Geolocation")
-
-            print(f"@[SOCK] Opened @({self.geoloc.get_block_string()})")
-            # add to a geoblock layer group
-            if self.geoloc and self.geoloc.is_valid():
-                async_to_sync(self.channel_layer.group_add)(
-                    self.geoloc.get_block_name(),
-                    self.channel_name
-                )
-                self.send_message_to_client("socket", "open")
+            print(f"[SOCK]<ANON> opened")
         except Exception as e:
             self.send_message_to_client("error", str(e))
             self.close()
@@ -67,10 +55,27 @@ class MessagesConsumer(WebsocketConsumer):
             # user authentication
             if self.scope["user"].id is None:
                 try:
-                    print(f">>[REC][Anon]: {text_data}")
-                    user = authenticate_token(json_data)
-                    self.scope["user"] = user
-                    self.send_message_to_client("socket", f"Authenticated successfully as {user.username}")
+                    print(f">>[REC]<Anon>: {text_data}")
+
+                    # parse the geolocation
+                    self.geoloc = parse_geoloc(json_data["lat"], json_data["long"])
+                    if self.geoloc is not None:
+                        # authenticate the user
+                        user = authenticate_token(json_data["token"])
+                        self.scope["user"] = user
+
+                        # user is authenticated with a valid geolocation
+                        print(f"@[SOCK]<{user.username}> Opened @({self.geoloc.get_block_string()})")
+
+                        # add user to a geoblock layer group
+                        if self.geoloc and self.geoloc.is_valid():
+                            async_to_sync(self.channel_layer.group_add)(
+                                self.geoloc.get_block_name(),
+                                self.channel_name
+                            )
+                            self.send_message_to_client("socket", "open")
+                    else:
+                        raise ValueError("Invalid Geolocation")
                 except:
                     raise ValidationError("Invalid Access Token")
 
