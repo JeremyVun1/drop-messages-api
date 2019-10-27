@@ -88,10 +88,20 @@ class MessagesConsumer(WebsocketConsumer):
                 if code == 0:
                     m = mf.create_message(geoloc=self.geoloc, message=parse_message(json_data['data']), user_id=self.scope["user"].id)
                     if m:
-                        self.send_message_to_client("post", f"message created: {m}")
+                        json_response = json.dumps({
+                            "id": m.pk,
+                            "success": True,
+                            "meta": ""
+                        })
+                        self.send_message_to_client("post", json_response)
                         self.notify_geoloc_group(m)
                     else:
-                        self.send_message_to_client("error", f"duplicate message found!")
+                        json_response = json.dumps({
+                            "id": m.pk,
+                            "success": False,
+                            "meta": "duplicate"
+                        })
+                        self.send_message_to_client("post", json_response)
 
                 # change geolocation
                 elif code == 1:
@@ -112,25 +122,45 @@ class MessagesConsumer(WebsocketConsumer):
 
                         self.send_message_to_client("socket", f"{new_geoloc.get_block_string()}")
                     else:
-                        self.send_message_to_client("error", f"Invalid geolocation")
+                        self.send_message_to_client("socket", f"invalid location")
 
                 # Upvote
                 elif code == 7:
                     msg_id = int(json_data["data"])
                     votes = mf.upvote(msg_id)
                     if votes is None:
-                        self.send_message_to_client("error", "Message not found")
+                        json_response = json.dumps({
+                            "id": msg_id,
+                            "success": False,
+                            "meta": "Not found"
+                        })
+                        self.send_message_to_client("vote", json_response)
                     else:
-                        self.send_message_to_client("post", { "id": msg_id, "votes": votes })
+                        json_response = json.dumps({
+                            "id": msg_id,
+                            "success": True,
+                            "meta": str(votes)
+                        })
+                        self.send_message_to_client("vote", json_response)
 
                 # Downvote
                 elif code == 8:
                     msg_id = int(json_data["data"])
                     votes = mf.downvote(msg_id)
                     if votes is None:
-                        self.send_message_to_client("error", "Message not found")
+                        json_response = json.dumps({
+                            "id": msg_id,
+                            "success": False,
+                            "meta": "Not found"
+                        })
+                        self.send_message_to_client("vote", json_response)
                     else:
-                        self.send_message_to_client("post", {"id": msg_id, "votes": votes})
+                        json_response = json.dumps({
+                            "id": msg_id,
+                            "success": True,
+                            "meta": str(votes)
+                        })
+                        self.send_message_to_client("vote", json_response)
 
                 # we already have a query set paginated, return the requested page instead of hitting DB
                 else:
