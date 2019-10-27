@@ -87,14 +87,15 @@
     // 1. OPEN-CLOSE web socket connection
     /////////////////////
     getDom("socket_open_submit").onclick = function(e) {
-        var geoloc = getVal("socket_lat") + "," + getVal("socket_long");
-        webSocket = new WebSocket(protocol + "//" + window.location.host + "/ws/" + geoloc + "/");
+        webSocket = new WebSocket(protocol + "//" + window.location.host + "/ws/");
 
         // register event handlers
         // Send the access token to authenticate ourselves after the socket is opened
         webSocket.onopen = function(e) {
             webSocket.send(JSON.stringify({
-                "token": getVal("token")
+                "token": getVal("token"),
+                "lat": getVal("socket_lat"),
+                "long": getVal("socket_long")
             }));
         }
 
