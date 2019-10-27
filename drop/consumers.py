@@ -260,10 +260,9 @@ class MessagesConsumer(WebsocketConsumer):
         }))
 
 
-def authenticate_token(json_data):
+def authenticate_token(token):
     print("authenticating token...")
     try:
-        token = json_data['token']
         valid_data = VerifyAuthTokenSerializer().validate({"token": token})
         return valid_data['user']
     except:
