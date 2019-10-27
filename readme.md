@@ -37,8 +37,9 @@ SERVER RESPONSE
 |API|category|data|
 |---|--------|----|
 |socket status info|"socket"|" "|
-|response about information posting|"post"|" "|
-|retrieved results|"retrieve"|" "|
+|response about information posting|"post"|{id:int, success:bool, meta:string}
+|retrieved results|"retrieve"|{id,lat,long,date,votes,seen}
+|upvote/downvote|"vote"|{id,success,meta}
 |errors|"error"|" "|
 |pushed notifications|"notification"|" "|
 
