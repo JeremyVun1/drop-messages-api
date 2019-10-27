@@ -14,22 +14,20 @@ Websocket API (JSON)
 ===============
 CLIENT REQUEST
 -------
-WS endpoint: https://drop-messages.herokuapp.com/ws/\<lat\>,\<long\>/
-
-e.g. Melbourne: https://drop-messages.herokuapp.com/ws/37.81,144.96/
+WS endpoint: https://drop-messages.herokuapp.com/ws/
 
 |Description|category|data|token|lat|long|
 |-----------|------|------|-----|---|----|
-|Required First message (Authentication)|||JWT|
-|Create message|0|"message"|
-|Change geolocation|1|||-90.0 < x > 90.0|-180.0 < x > 180.0|
-|Get top msg's|2|x >= 1|
-|Get newest msgs's|3|x >= 1|
-|Get random msgs's|4|x >= 1|
-|Get msgs's within radius|5|x >= 1|||||
-|Get my msg's|6|x >= 1|
-|Upvote|7|message id|
-|Downvote|8|message_id|
+|Required First message (Authentication)|||x|x|x|
+|Create message|0|x|
+|Change geolocation|1|||x|x|
+|Get top msg's|2|x|
+|Get newest msgs's|3|x|
+|Get random msgs's|4|x|
+|Get msgs's within radius|5|x|||||
+|Get my msg's|6|x|
+|Upvote|7|x|
+|Downvote|8|x|
 |Disconnect|9|
 
 SERVER RESPONSE
