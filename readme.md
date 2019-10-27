@@ -39,6 +39,7 @@ SERVER RESPONSE
 |retrieved results|"retrieve"|{id,lat,long,date,votes,seen}
 |upvote/downvote|"vote"|{id,success,meta}
 |errors|"error"|" "|
+|token info|"token"|" "|
 |pushed notifications|"notification"|" "|
 
 Rest API endpoints (POST)
