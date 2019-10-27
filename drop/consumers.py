@@ -26,7 +26,7 @@ class MessagesConsumer(WebsocketConsumer):
         self.accept()
         try:
             print(f"[SOCK]<ANON> opened")
-            self.geooloc = None
+            self.geoloc = None
         except Exception as e:
             self.send_message_to_client("error", str(e))
             self.close()
@@ -54,7 +54,7 @@ class MessagesConsumer(WebsocketConsumer):
             # user authentication
             if self.geoloc is None or self.scope["user"].id is None:
                 try:
-                    print(f">>[REC]<Anon>: {text_data}")
+                    print(f">>[REC]<Anon>: {json_data}")
 
                     # parse the geolocation
                     self.geoloc = parse_geoloc(json_data["lat"], json_data["long"])
