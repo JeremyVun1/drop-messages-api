@@ -210,11 +210,9 @@ class MessagesConsumer(WebsocketConsumer):
                         self.send_retrieved_messages(self.qs_cache.page(page_num))
 
         # handle exceptions
-        except ValidationError as v:
-            self.send_message_to_client("error", f"{v}")
-            self.close()
         except Exception as e:
-            self.send_message_to_client("error", "error encountered")
+            self.send_message_to_client("error", f"{e}")
+            self.close()
 
     # notify whole group of a new message
     def notify_geoloc_group(self, message):
