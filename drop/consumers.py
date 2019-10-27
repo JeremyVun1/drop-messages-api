@@ -257,11 +257,12 @@ class MessagesConsumer(WebsocketConsumer):
 
     # send a data frame to the client
     def send_message_to_client(self, category, data):
-        data_str = json.dumps(data)
+        if not isinstance(data, str):
+            data = json.dumps(data)
         print(f"<<[SND][{self.scope['user'].username}]: cat: {category}, data: {data}")
         self.send(text_data=json.dumps({
             "category": category,
-            "data": data_str
+            "data": data
         }))
 
 
