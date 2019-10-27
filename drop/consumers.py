@@ -9,6 +9,8 @@ import json
 # authentication imports
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.exceptions import ValidationError
+
+from drop.custom_exceptions import TokenError
 from .drfjwt.serializers import VerifyAuthTokenSerializer
 
 # business imports
@@ -211,7 +213,11 @@ class MessagesConsumer(WebsocketConsumer):
 
         # handle exceptions
         except Exception as e:
-            self.send_message_to_client("error", f"{e}")
+            if e is TokenError:
+                self.send_message_to_client("token", f"{e}")
+            else:
+                self.send_message_to_client("error", f"{e}")
+
             self.close()
 
     # notify whole group of a new message
@@ -264,4 +270,7 @@ def authenticate_token(token):
         valid_data = VerifyAuthTokenSerializer().validate({"token": token})
         return valid_data['user']
     except:
-        raise ValidationError("Invalid access token")
+        raise TokenError("Invalid access token")
+
+
+
