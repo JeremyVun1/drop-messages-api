@@ -26,6 +26,7 @@ class MessagesConsumer(WebsocketConsumer):
         self.accept()
         try:
             print(f"[SOCK]<ANON> opened")
+            self.geooloc = None
         except Exception as e:
             self.send_message_to_client("error", str(e))
             self.close()
@@ -47,13 +48,11 @@ class MessagesConsumer(WebsocketConsumer):
     # noinspection PyMethodOverriding
     def receive(self, text_data):
         try:
-            if self.geoloc is None:
-                return
-
             json_data = json.loads(text_data)
+            print(json_data)
 
             # user authentication
-            if self.scope["user"].id is None:
+            if self.geoloc is None or self.scope["user"].id is None:
                 try:
                     print(f">>[REC]<Anon>: {text_data}")
 
