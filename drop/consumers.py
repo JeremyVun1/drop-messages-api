@@ -173,8 +173,10 @@ class MessagesConsumer(WebsocketConsumer):
                     page_num = max(1, parse_int(json_data['page']))
 
                     if code == self.last_code and self.qs_cache:
-                        page_num = min(page_num, self.qs_cache.num_pages)
-                        self.send_retrieved_messages(self.qs_cache.page(page_num))
+                        if page_num > self.qs_cache.num_pages:
+                            self.send_retrieved_messages([]) # send empty is emmpty
+                        else:
+                            self.send_retrieved_messages(self.qs_cache.page(page_num))
 
                     # Messages by vote ranking
                     elif code == 2:
@@ -225,7 +227,7 @@ class MessagesConsumer(WebsocketConsumer):
         if message:
             self.notified_id = message.pk
             async_to_sync(self.channel_layer.group_send)(
-                str(self.geoloc),
+                str(self.geoloc.get_block_string()),
                 {
                     # type specifies the function to be called when received
                     'type': 'receive_notification',
