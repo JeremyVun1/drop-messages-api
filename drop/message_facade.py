@@ -26,12 +26,16 @@ def create_message(geoloc, message, user_id):
 		return None
 
 
-def delete_message(msg_id):
+def delete_message(msg_id, user_id):
 	try:
 		msg_id = int(msg_id)
 		m = Message.objects.get(pk=msg_id)
-		m.delete()
-		return msg_id
+		print(f"DELETING {m.author.pk} =? {user_id}")
+
+		if m.author.pk == user_id:
+			m.delete()
+			return msg_id
+		return None
 	except:
 		return None
 

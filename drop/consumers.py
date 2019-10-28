@@ -110,7 +110,7 @@ class MessagesConsumer(WebsocketConsumer):
                         self.send_message_to_client("post", json_response)
 
                 elif code == 10:
-                    mf.delete_message(json_data['data'])
+                    mf.delete_message(json_data['data'], self.scope['user'].id)
 
                 # change geolocation
                 elif code == 1:
@@ -118,18 +118,18 @@ class MessagesConsumer(WebsocketConsumer):
                     if new_geoloc.is_valid():
                         # leave current group
                         async_to_sync(self.channel_layer.group_discard)(
-                            self.geoloc.get_block_string(),
+                            self.geoloc.get_block_name(),
                             self.channel_name
                         )
 
                         # join new group
                         self.geoloc = new_geoloc
                         async_to_sync(self.channel_layer.group_add)(
-                            self.geoloc.get_block_string(),
+                            self.geoloc.get_block_name(),
                             self.channel_name
                         )
 
-                        self.send_message_to_client("socket", f"{new_geoloc.get_block_string()}")
+                        self.send_message_to_client("socket", f"{new_geoloc.get_block_name()}")
                     else:
                         self.send_message_to_client("socket", f"invalid location")
 
@@ -230,7 +230,7 @@ class MessagesConsumer(WebsocketConsumer):
         if message:
             self.notified_id = message.pk
             async_to_sync(self.channel_layer.group_send)(
-                str(self.geoloc.get_block_string()),
+                str(self.geoloc.get_block_name()),
                 {
                     # type specifies the function to be called when received
                     'type': 'receive_notification',
