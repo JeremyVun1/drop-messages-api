@@ -12,6 +12,7 @@ from rest_framework.exceptions import ValidationError
 
 from drop.custom_exceptions import TokenError
 from .drfjwt.serializers import VerifyAuthTokenSerializer
+from django.db import close_old_connections
 
 # business imports
 from .util import *
@@ -50,6 +51,7 @@ class MessagesConsumer(WebsocketConsumer):
     # noinspection PyMethodOverriding
     def receive(self, text_data):
         try:
+            close_old_connections()
             json_data = json.loads(text_data)
             print(json_data)
 
@@ -129,9 +131,17 @@ class MessagesConsumer(WebsocketConsumer):
                             self.channel_name
                         )
 
-                        self.send_message_to_client("socket", f"{new_geoloc.get_block_name()}")
+                        self.send_message_to_client("geoloc", json.dumps({
+                            "result": True,
+                            "lat": self.geoloc.lat,
+                            "long": self.geoloc.long
+                        }))
                     else:
-                        self.send_message_to_client("socket", f"invalid location")
+                        self.send_message_to_client("geoloc", json.dumps({
+                            "result": False,
+                            "lat": self.geoloc.lat,
+                            "long": self.geoloc.long
+                        }))
 
                 # Upvote
                 elif code == 7:
