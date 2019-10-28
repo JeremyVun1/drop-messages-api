@@ -97,7 +97,7 @@ class MessagesConsumer(WebsocketConsumer):
                         json_response = json.dumps({
                             "id": m.pk,
                             "success": True,
-                            "meta": ""
+                            "meta": serialize_message(m)
                         })
                         self.send_message_to_client("post", json_response)
                         self.notify_geoloc_group(m)
@@ -247,6 +247,8 @@ class MessagesConsumer(WebsocketConsumer):
 
     # send message query set back to the client
     def send_retrieved_messages(self, qs):
+        mf.update_seen(qs)
+
         if qs is not None:
             result = []
             for m in qs:

@@ -106,6 +106,10 @@ def downvote(id):
 	except:
 		return None
 
+
 # TEST
 def update_seen(qs):
-	pass
+	for m in qs:
+		model = Message.objects.get(pk=m.pk)
+		model.seen += 1
+		model.save()
