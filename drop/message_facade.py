@@ -28,6 +28,7 @@ def create_message(geoloc, message, user_id):
 
 def delete_message(msg_id):
 	try:
+		msg_id = int(msg_id)
 		m = Message.objects.get(pk=msg_id)
 		m.delete()
 		return msg_id
