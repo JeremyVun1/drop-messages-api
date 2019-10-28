@@ -97,7 +97,7 @@ class MessagesConsumer(WebsocketConsumer):
                         json_response = json.dumps({
                             "id": m.pk,
                             "success": True,
-                            "meta": json.dumps(serialize_message(m))
+                            "meta": serialize_message(m)
                         })
                         self.send_message_to_client("post", json_response)
                         self.notify_geoloc_group(m)
