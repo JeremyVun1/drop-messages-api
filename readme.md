@@ -18,7 +18,6 @@ WS endpoint: https://drop-messages.herokuapp.com/ws/
 
 |Description|category|data|token|lat|long|
 |-----------|------|------|-----|---|----|
-|Required First message (Authentication)|||x|x|x|
 |Create message|0|x|
 |Change geolocation|1|||x|x|
 |Get top msg's|2|x|
@@ -30,6 +29,7 @@ WS endpoint: https://drop-messages.herokuapp.com/ws/
 |Downvote|8|x|
 |Disconnect|9|
 |Delete message|10|x|
+|Required First message (Authentication)|11||x|x|x|
 
 SERVER RESPONSE
 ---------
