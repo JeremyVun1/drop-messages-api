@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'dropmessages.wsgi.application'
 
 # dj database url uses heroku database_url on heroku, and sqlite from .env on local
 DATABASES = { }
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+DATABASES['default'] = dj_database_url.config(conn_max_age=60)
 
 
 # Password validation
