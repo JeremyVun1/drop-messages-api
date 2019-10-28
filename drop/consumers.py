@@ -95,16 +95,16 @@ class MessagesConsumer(WebsocketConsumer):
                     m = mf.create_message(geoloc=self.geoloc, message=parse_message(json_data['data']), user_id=self.scope["user"].id)
                     if m:
                         json_response = json.dumps({
-                            "id": m.pk,
-                            "success": True,
-                            "meta": serialize_message(m)
+                            "echo": serialize_message(m),
+                            "result": True,
+                            "meta": ""
                         })
                         self.send_message_to_client("post", json_response)
                         self.notify_geoloc_group(m)
                     else:
                         json_response = json.dumps({
-                            "id": m.pk,
-                            "success": False,
+                            "echo": serialize_message(m),
+                            "result": False,
                             "meta": "duplicate"
                         })
                         self.send_message_to_client("post", json_response)
