@@ -92,7 +92,7 @@ class MessagesConsumer(WebsocketConsumer):
                     self.close()
 
                 # create message
-                if code == 0:
+                elif code == 0:
                     m = mf.create_message(geoloc=self.geoloc, message=parse_message(json_data['data']), user_id=self.scope["user"].id)
                     if m:
                         json_response = json.dumps({
