@@ -29,6 +29,7 @@ WS endpoint: https://drop-messages.herokuapp.com/ws/
 |Upvote|7|x|
 |Downvote|8|x|
 |Disconnect|9|
+|Delete message|10|x|
 
 SERVER RESPONSE
 ---------
