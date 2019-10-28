@@ -53,10 +53,10 @@ class MessagesConsumer(WebsocketConsumer):
         try:
             close_old_connections()
             json_data = json.loads(text_data)
-            print(json_data)
+            code = json_data['category']
 
             # user authentication
-            if self.geoloc is None or self.scope["user"].id is None:
+            if code == 11 or self.geoloc is None or self.scope["user"].id is None:
                 try:
                     print(f">>[REC]<Anon>: {json_data}")
 
@@ -85,7 +85,6 @@ class MessagesConsumer(WebsocketConsumer):
             # user is authenticated, receive the client message and route based on category code
             else:
                 print(f">>[REC][{self.scope['user'].username}]: {text_data}")
-                code = json_data['category']
 
                 # client wishes to close the socket
                 if code == 9:
