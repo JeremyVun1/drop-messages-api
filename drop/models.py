@@ -4,6 +4,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
+from .constants import MAX_MESSAGE_LENGTH
 
 
 class Message(models.Model):
@@ -11,7 +12,7 @@ class Message(models.Model):
 	long = models.FloatField()
 	lat_block = models.FloatField()
 	long_block = models.FloatField()
-	message = models.CharField(max_length=140)
+	message = models.CharField(max_length=MAX_MESSAGE_LENGTH)
 	date = models.DateTimeField(default=now)
 	votes = models.IntegerField(default=1)
 	seen = models.IntegerField(default=0)
