@@ -109,6 +109,9 @@ class MessagesConsumer(WebsocketConsumer):
                         })
                         self.send_message_to_client("post", json_response)
 
+                elif code == 10:
+                    mf.delete_message(json_data['id'])
+
                 # change geolocation
                 elif code == 1:
                     new_geoloc = Geoloc(json_data['lat'], json_data['long'])

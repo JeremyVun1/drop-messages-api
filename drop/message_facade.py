@@ -26,6 +26,15 @@ def create_message(geoloc, message, user_id):
 		return None
 
 
+def delete_message(msg_id):
+	try:
+		m = Message.objects.get(pk=msg_id)
+		m.delete()
+		return msg_id
+	except:
+		return None
+
+
 # TODO - figure out how to page these queries
 def retrieve_messages_ranked(geoloc):
 	try:
