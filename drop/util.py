@@ -6,8 +6,9 @@ from .constants import GEOLOC_RESOLUTION, MAX_MESSAGE_LENGTH, MAX_RANGE
 
 
 class Stub:
-	def __init__(self, id, lat, long):
+	def __init__(self, id, author, lat, long):
 		self.id = id
+		self.author = author
 		self.lat = lat
 		self.long = long
 
