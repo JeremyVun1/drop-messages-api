@@ -5,6 +5,13 @@ from drop.models import Message
 from .constants import GEOLOC_RESOLUTION, MAX_MESSAGE_LENGTH, MAX_RANGE
 
 
+class Stub:
+	def __init__(self, id, lat, long):
+		self.id = id
+		self.lat = lat
+		self.long = long
+
+
 class Geoloc:
 	def __init__(self, lat, long):
 		self.lat = float(lat)

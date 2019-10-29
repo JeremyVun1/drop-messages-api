@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from drop.models import Message
 from drop.constants import DELETE_THRESH, PAGE_SIZE
-from .util import Geoloc
+from .util import Geoloc, Stub
 
 
 def create_message(geoloc, message, user_id):
@@ -40,7 +40,29 @@ def delete_message(msg_id, user_id):
 		return None
 
 
-# TODO - figure out how to page these queries
+# retrieve a single message only
+def retrieve_single_message(msg_id):
+	try:
+		return Message.objects.get(pk=msg_id)
+	except:
+		return None
+
+
+# get all messages in geoblock and return as stubs (id, lat, long)
+def retrieve_message_stubs(geoloc):
+	try:
+		if geoloc and geoloc.is_valid():
+			block = geoloc.get_block()
+			qs = Message.objects.filter(lat_block=block.lat, long_block=block.long)
+
+			result = []
+			for m in qs:
+				result.append(Stub(m.pk, m.lat, m.long))
+			return result
+	except:
+		return None
+
+
 def retrieve_messages_ranked(geoloc):
 	try:
 		if geoloc and geoloc.is_valid():

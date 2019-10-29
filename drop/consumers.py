@@ -142,6 +142,18 @@ class MessagesConsumer(WebsocketConsumer):
                             "long": self.geoloc.long
                         }))
 
+                # retrieve a single message
+                elif code == 12:
+                    msg_id = int(json_data["data"])
+                    m = mf.retrieve_single_message(msg_id)
+                    m = serialize_message(m)
+                    self.send_message_to_client("single", m)
+
+                # retrieve all messages in geolocation but return only stubs
+                elif code == 13:
+                    response = mf.retrieve_message_stubs(geoloc=self.geoloc)
+                    self.send_message_to_client("stubs", response)
+
                 # Upvote
                 elif code == 7:
                     msg_id = int(json_data["data"])
