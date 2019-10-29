@@ -30,6 +30,8 @@ WS endpoint: https://drop-messages.herokuapp.com/ws/
 |Disconnect|9|
 |Delete message|10|x|
 |Required First message (Authentication)|11||x|x|x|
+|Get single msg|12|x|
+|Get all stubs|13|||x|x|
 
 SERVER RESPONSE
 ---------
@@ -37,11 +39,13 @@ SERVER RESPONSE
 |---|--------|----|
 |socket status info|"socket"|" "|
 |response about information posting|"post"|{id:int, success:bool, meta:string}
-|retrieved results|"retrieve"|{id,lat,long,date,votes,seen}
+|retrieved results|"retrieve"|[{id,lat,long,date,votes,seen}]|
 |upvote/downvote|"vote"|{id,success,meta}
 |errors|"error"|" "|
 |token info|"token"|" "|
 |pushed notifications|"notification"|" "|
+|returned single message|"single"|" "|
+|messages as stubs|"stubs"|[]|
 
 Rest API endpoints (POST)
 ===========
