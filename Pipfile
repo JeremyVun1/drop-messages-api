@@ -38,7 +38,7 @@ Twisted = "==19.7.0"
 "zope.interface" = "==4.6.0"
 
 [packages]
-drf-jwt = "==1.13.3"
+drf-jwt = "==1.15.1"
 django-heroku = "*"
 channels = "*"
 channels-redis = "*"
